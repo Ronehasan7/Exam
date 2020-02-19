@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title> Text Box Auto Completion </title>
+		
+		<style>
+			.container {
+				width: 500px;
+				min-height: 300px;
+				margin: 0 auto;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				box-shadow: 0px 0px 10px #ccc;
+				border-radius: 4px;
+				flex-direction: column;
+			}
+			.container form{
+				width: 300px;
+			}
+			label {
+				display: inline-block;
+				max-width: 100%;
+				margin-bottom: 10px;
+				font-weight: 700;
+			}
+			#country {
+				display: block;
+				width: 100%;
+				height: auto;
+				padding: 6px 12px;
+				font-size: 14px;
+				border-radius: 4px;
+				border: 1px solid #ccc;
+				width: 275px;
+			}
+			ul#autocomplete-results{
+				margin: 0;
+				padding-left: 0px;
+				width: 300px;
+			}
+			ul#autocomplete-results li{
+				list-style: none;
+				padding: 5px;
+				border: 1px solid #f1f1f1;
+				border-radius: 4px;
+			}
+			li.result.highlighted{
+				background-color: #eaeaea;
+			}
+			/*#autocomplete-results li {
+				display: none;
+			}
+			ul#autocomplete-results.visible li {
+			display: block;
+			}*/
+		</style>
+
+	</head>
+	<body>
+		<div class="container">
+			<form action="" >
+				<label for="country"> Please enter your Country </label>
+				<input type="text" id="country" name="country" placeholder="Type Here" >
+				
+			</form>
+			
+			<ul id="autocomplete-results"></ul>
+		</div>
+		
+		
+		<script>
+		
+		var targetInput = document.getElementById("country"),
+	results = document.getElementById("autocomplete-results"),
+	countryList = ['Bangladesh', 'Pakistan', 'Canada', 'South Africa', 'Jordan', 'Kenya', 'Nepal', 'Romania', 'Sri Lanka', 'Wales'],
+	matches = [],
+	resultsCursor = 0;
+	
+targetInput.focus();
+targetInput.addEventListener( "keydown", function( event ) {
+	if ( event.keyCode == "13" ) {
+		event.preventDefault();
+	}
+} );
+
+targetInput.addEventListener( "keyup", function( event ) {
+	/*
+	* Key codes
+	* 
+	* Enter: 13
+	*Arrow up: 38
+	* Arrow down: 40
+	*
+	*/
+	results.innerHTML = "";
+	toggleResults( "hide" );
+	
+	if ( this.value.length > 0 ) {
+		matches = getMatches( this.value );
+		
+		if ( matches.length > 0 ) {
+			displayMatches( matches );
+		}
+	}
+	
+	if ( results.classList.contains( "visible" ) ) {
+		switch( event.keyCode ) {
+			case 13:
+				targetInput.value = results.children[resultsCursor].innerHTML;
+				toggleResults( "hide" );
+				resultsCursor = 0;
+				break;
+			case 38:
+				if( resultsCursor > 0 ) {
+					resultsCursor--;
+					moveCursor( resultsCursor );
+				}
+				break;
+			case 40:
+				if( resultsCursor < ( matches.length - 0 ) ) {
+					resultsCursor++;
+					moveCursor( resultsCursor );
+				}
+				break;
+		}
+	}
+} );
+
+function toggleResults( action ) {
+	if ( action == "show" ) {
+		results.classList.add( "visible" );
+	} else if ( action == "hide" ) {
+		results.classList.remove( "visible" );
+	}
+}
+
+function getMatches( inputText ) {
+	var matchList = [];
+	
+	for ( var i = 0; i < countryList.length; i++ ) {
+		if ( countryList[i].toLowerCase().indexOf( inputText.toLowerCase() ) != -1) {
+			matchList.push( countryList[i] );
+		}
+	}
+	return matchList;
+}
+
+function displayMatches( matchList ) {
+	var j = 0;
+	
+	while ( j < matchList.length ) {
+		results.innerHTML += '<li class="result">' + matchList[j] + '</li>'; 
+		j++;
+	}
+	
+	moveCursor( resultsCursor );
+	
+	toggleResults( "show" );
+}
+
+function moveCursor( pos ) {
+	for ( var x = 0; x < results.children.length; x++ ) {
+		results.children[x].classList.remove( "highlighted" );
+	}
+	results.children[pos].classList.add( "highlighted" );
+}
+		</script>
+	</body>
+</html>
